@@ -1,5 +1,6 @@
-from t.terminal import *
+from .terminal import *
 from os import get_terminal_size as gts
+from time import sleep
 
 bg_color=white
 text_color=black
@@ -11,30 +12,29 @@ def settheme(text=black,bg=white,bold=False):
     theme_bold=bold
 
 
-def chooseinlist(li,head='',tail='',fm='{}'):
-    print('\033[?25l',end='')
-    foc=0
-    ot=len(head.split('\n'))+len(head.split('\n'))+1
+def chooseinlist(li,head='',tail='',fm='{}',focm='{}',foc=0):
+    if focm=='{}':focm=fm
+    set_cursor(False)
+    ot=+len(head.split('\n'))+1
     while 1:
-        clear()
-        print(head)
+        print(clear_c+head)
         if gts().lines>=len(li)+ot:
             for i in range(len(li)):
                 if i==foc:
-                    print(color(fm.format(li[i]),text_color,bg_color,bold=theme_bold))
+                    print(color(focm.format(li[i]),text_color,bg_color,bold=theme_bold))
                 else:
                     print(fm.format(li[i]))
         else:
             if foc+1+ot<=gts().lines:
                 for i in range(gts().lines-ot):
                     if i==foc:
-                        print(color(fm.format(li[i]),text_color,bg_color,bold=theme_bold))
+                        print(color(focm.format(li[i]),text_color,bg_color,bold=theme_bold))
                     else:
                         print(fm.format(li[i]))
             else:
                 for i in range(foc-(gts().lines-ot)+1,foc+1):
                     if i==foc:
-                        print(color(fm.format(li[i]),text_color,bg_color,bold=theme_bold))
+                        print(color(focm.format(li[i]),text_color,bg_color,bold=theme_bold))
                     else:
                         print(fm.format(li[i]))
         print(tail,end='')
@@ -46,11 +46,15 @@ def chooseinlist(li,head='',tail='',fm='{}'):
             elif ge==b'P':
                 foc+=(1 if foc<len(li)-1 else 0)
         elif ge==b'\r':
-            print('\033[?25h',end='')
+            set_cursor(True)
             return foc
         elif ge==b'\x03':
             exit()
-# settheme(white,cyan,True)
-# print(chooseinlist(
-#     range(40)
-#     ,'请选择正确答案:'))
+
+def fade_print(s,t,fm='{}',focm='{}',end='\n'):
+    l=len(s)
+    if focm=='{}':focm=fm
+    for i in range(l-1,-1,-1):
+        print('\r'+fm.format(f'{s[i:]}'),end='')
+        sleep(t)
+    print('\r'+focm.format(s),end=end)

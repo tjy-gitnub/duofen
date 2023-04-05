@@ -39,6 +39,7 @@ def defcolor():
 def clear():
     print("\x1b[2J",end='')
 
+clear_c="\x1b[2J"
 
 def error(ty, msg):
     print(color("> ",red),end='')
@@ -47,3 +48,6 @@ def error(ty, msg):
     print(color('Press any key to continue...',green))
     getch()
     return ''
+
+def set_cursor(b):
+    print('\033[?25h' if b else '\033[?25l',end='')
