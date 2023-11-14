@@ -49,12 +49,12 @@ def chooseinlist(li,head='',tail='',fm='{}',focm='{}',foc=0):
             set_cursor(True)
             return foc
         elif ge==b'\x03':
-            exit()
+            raise KeyboardInterrupt
 
-def fade_print(s,t,fm='{}',focm='{}',end='\n'):
+def fade_print(s,gaptime,fm='{}',focm='{}',end='\n'):
     l=len(s)
     if focm=='{}':focm=fm
     for i in range(l-1,-1,-1):
         print('\r'+fm.format(f'{s[i:]}'),end='')
-        sleep(t)
+        sleep(gaptime)
     print('\r'+focm.format(s),end=end)

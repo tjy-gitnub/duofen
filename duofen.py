@@ -3,13 +3,17 @@ from functools import cmp_to_key
 from t.terminal import *
 from webbrowser import open as open_inb
 from t import pyui
+import os
 init(autoreset=True)
-pyui.settheme(blue,0,True)
+thm=blue
+pyui.settheme(thm,0,True)
 
 def err(a,b):
+    clear()
+    pyui.sleep(0.3)
     pyui.fade_print(a,0.03,fm=' |'+color('{}',red,bold=True),focm=color(' |',red,bold=True)+color('{}',red))
     print('   '+b)
-    print(color('   Press any key to exit...',blue,bold=True),end='')
+    print(color('   Press any key to exit...',thm,bold=True),end='')
     getch()
     exit()
 
@@ -18,10 +22,10 @@ def bjpm(d):
         d['schCode'], d['yearIn'], d['clzCode'], d['schStuCode'], d['examCode'], d['paperCode'], d['subject']['id'])
     zf = d['examScore']/100
     print(color('\n   班级排名\n',black,bg=white))
-    print(color(' |',blue,bold=True)+'正在加载',end='')
+    print(color(' |',thm,bold=True)+'正在加载',end='')
     x = r.get(u, cookies=cook).json()
     clear()
-    print(color('\n   班级排名\n',black,bg=white))
+    print(color('\n   班级排名\n',black,bg=white)+'为保护同学隐私，未显示姓名与学号\n')
     x['data']['others'].insert(0, x['data']['min'][0])
     def _cmp(r, u):
         # cmp func(in sort)
@@ -47,14 +51,14 @@ def bjpm(d):
                 continue
             print(' '+color('1',yellow,bold=True), end='')
         print('\t'+str(tmp if tmp!=int(tmp) else int(tmp)))
-    print(color(' Press any key to go back...',blue,bold=True),end='')
+    print(color(' Press any key to go back...',thm,bold=True),end='')
     getch()
 
 def yj(d):
     u = 'http://www.moofen.net/student/xqfx/kq/paper/raw/get/{}/{}/{}/{}/{}/{}/{}'.format(
         d['schCode'], d['clzCode'], d['schStuCode'], d['examCode'], d['examDate'], d['subject']['id'], d['paperCode'])
     print(color('\n   原卷\n',black,bg=white))
-    print(color(' |',blue,bold=True)+'正在加载',end='')
+    print(color(' |',thm,bold=True)+'正在加载',end='')
     x = r.get(u, cookies=cook).json()
     while 1:
         c=pyui.chooseinlist(list(range(1,len(x['data'])+1))+['返回'],color('\n   原卷\n',black,bg=white)+f'\n 共 {len(x["data"])} 张',fm='  {}',focm=' |{}')
@@ -66,7 +70,7 @@ def tm(d):
     u = 'http://www.moofen.net/student/xqfx/kq/paper/aoq/get/{}/{}/{}/{}/{}/{}/{}'.format(
         d['schCode'], d['yearIn'],d['clzCode'],d['schStuCode'],d['examCode'], d['paperCode'],d['subject']['id'])
     print(color('\n   所有题目\n',black,bg=white))
-    print(color(' |',blue,bold=True)+'正在加载',end='')
+    print(color(' |',thm,bold=True)+'正在加载',end='')
     x = r.get(u, cookies=cook).json()
     while 1:
         clear()
@@ -78,8 +82,8 @@ def tm(d):
             else:
                 _t='\t'
                 print(color(f" {p[i]['scoreNo']}\t-{(p[i]['itemScore']-p[i]['stuScore'])/100}分\t{p[i]['stuScore']/100}/{p[i]['itemScore']/100}{_t+'标答:'+p[i]['answer'] if len(p[i]['answer']) else ''}",red))
-        print(f" {color('|',blue,bold=True)}按 {color('d',underline=True,bold=True)} 查看详细,按 其它任意键 返回")
-        print(color(' >',blue,bold=True),end='')
+        print(f" {color('|',thm,bold=True)}按 {color('d',underline=True,bold=True)} 查看详细,按 其它任意键 返回")
+        print(color(' >',thm,bold=True),end='')
         t=getch()
         if t==b'd':
             clear()
@@ -89,33 +93,55 @@ def tm(d):
                 if p[i]['isCorrect']:
                     print(f"{color(' '+p[i]['scoreNo'],green)} 得分{p[i]['stuScore']/100}/{p[i]['itemScore']/100} 班级平均{p[i]['clzScore']/100}分,{p[i]['clzRatio']/100}%  年级平均{p[i]['grdScore']/100}分,{p[i]['grdRatio']/100}% {'标答 '+p[i]['answer'] if p[i]['type']['id']=='C' else p[i]['type']['name']}")
                 else:
-                    print(f"{color(' '+p[i]['scoreNo'],red)} 得分{p[i]['stuScore']/100}/{p[i]['itemScore']/100} 班级平均{p[i]['clzScore']/100}分,{p[i]['clzRatio']/100}%  年级平均{p[i]['grdScore']/100}分,{p[i]['grdRatio']/100}% {'标答 '+p[i]['answer']+',实答'+p[i]['choice'] if p[i]['type']['id']=='C' else p[i]['type']['name']}")
-            print(f" {color('|',blue,bold=True)}按 {color('d',underline=True,bold=True)} 隐藏详细,按 其它任意键 返回")
-            print(color(' >',blue,bold=True),end='')
+                    try:
+                        print(f"{color(' '+p[i]['scoreNo'],red)} 得分{p[i]['stuScore']/100}/{p[i]['itemScore']/100} 班级平均{p[i]['clzScore']/100}分,{p[i]['clzRatio']/100}%  年级平均{p[i]['grdScore']/100}分,{p[i]['grdRatio']/100}% {'标答 '+p[i]['answer']+',实答'+p[i]['choice'] if p[i]['type']['id']=='C' else p[i]['type']['name']}")
+                    except KeyError:
+                        print(f"{color(' '+p[i]['scoreNo'],red)} 得分{p[i]['stuScore']/100}/{p[i]['itemScore']/100} 班级平均{p[i]['clzScore']/100}分,{p[i]['clzRatio']/100}%  年级平均{p[i]['grdScore']/100}分,{p[i]['grdRatio']/100}% {'标答 '+p[i]['answer']+',实答?'}")
+            print(f" {color('|',thm,bold=True)}按 {color('d',underline=True,bold=True)} 隐藏详细,按 其它任意键 返回")
+            print(color(' >',thm,bold=True),end='')
             t=getch()
             if t==b'd':
                 continue
         break
+def setting():
+    rs=pyui.chooseinlist(['设置 schStuCode','退出设置'],color('\n   程序设置\n',black,bg=white)+'应用设置文件保存于 C:\\stsc\\duofen\\setting.txt\n',fm='  {}',focm=' |{}')
+    if rs==0:
+        clear()
+        print(color('\n   程序设置\n',black,bg=white))
+        print(color(' |',thm,bold=True)+'设置 schStuCode:')
+        rs = input('  ')
+        try:
+            open('C:\\stsc\\duofen\\setting.txt','w').write(rs)
+        except FileNotFoundError:
+            os.makedirs('C:\\stsc\\duofen')
+            open('C:\\stsc\\duofen\\setting.txt','w').write(rs)
+        print('保存成功')
+        pyui.sleep(1)
+        setting()
+    else:
+        return
 
 
 print(f"""
-   {color('多分破解版',bold=True)}
-   Developed by {color('谭景元',blue,bold=True)}
+   {color('多分破解版',bold=True)}{color('(python 3.9.32 on win32)',black,bold=True)}
+   Developed by {color('谭景元',thm,bold=True)}
    {color('禁止外传',red,bold=True)}
 """)
-pyui.sleep(3)
+pyui.sleep(2)
+clear()
+if pyui.chooseinlist(['启动!','程序设置'],fm='  {}',focm=' |{}')==1:
+    setting()
 clear()
 print(color('\n   登录\n',black,bg=white))
-pyui.fade_print('输入Cookies',0.03,fm=' |'+color('{}',blue,bold=True),focm=color(' |',blue,bold=True)+color('{}',bold=True))
+print(color(' |',thm,bold=True)+'输入Cookies:')
 yi = input('  ')
 cook = eval('{"'+yi.replace('=', '":"').replace(';', '","')+'"}')
 clear()
-print(color('\n   登录\n',black,bg=white))
-pyui.fade_print('输入schStuCode:',0.03,fm=' |'+color('{}',blue,bold=True),focm=color(' |',blue,bold=True)+color('{}',bold=True))
-scst = input('  ')
-# scst='2094763655660000'
-clear()
-print(color('\n |',blue,bold=True)+'正在加载',end='')
+try:
+    scst=open('C:\\stsc\\duofen\\setting.txt','r').read()
+except FileNotFoundError:
+    err('高级错误','烦劳您仔细阅读说明，设置 schStuCode')
+print(color('\n |',thm,bold=True)+'正在加载',end='\n多分有时会限流，加载1分钟无果后请尝试在晚上11点左右重试')
 try:
     # 请求考试列表
     xi = r.get(
@@ -123,24 +149,24 @@ try:
         cookies=cook).json()
 except r.exceptions.JSONDecodeError:
     clear()
-    err('高级错误','登录失败，请检查Cookie')
-
+    err('高级错误','登录失败，Cookies无效。可能是登录超过时限需要重新登录，或Cookies输入有误。')
+# open('a.txt','w').write(str(xi))
 focbf=0
 while True:
     testid=pyui.chooseinlist(xi['data'],color('   考试列表\n',black,bg=white),fm='  {[examName]}',focm=' |{[examName]}',foc=focbf)
     focbf=testid
     testname=xi['data'][testid]['examName']
     d = xi['data'][testid]
-    if len(d['subjects']) > 1:
+    if d['examType']['isMultiple']:
         # 有多个学科
         d = xi['data'][testid]['subjects'][pyui.chooseinlist(d['subjects'],color('\n   '+testname+'\n\n',black,bg=white)+f" {color(str(d['stuScore']/100),yellow)} 分   {d['scoreLevel']}\n\
- 班排 {color(str(d['clzRankPosition']),yellow)} 名   年排 {color(str(d['grdRankPosition']),yellow)} 名\n",fm='  {[paperName]}',focm=' |{[paperName]}')]
+ 班排 {color(str(d['clzRankPosition']),yellow)} 名   年排 {color(str(d['grdRankPosition']),yellow)} 名({color('↑'+str(d['grdRankChanged']),green) if d['grdRankChanged']>=0 else color('↓'+str(-d['grdRankChanged']),red)})\n",fm='  {[paperName]}',focm=' |{[paperName]}')]
         testname=d['paperName']
     while True:
         clear()
         tmp=pyui.chooseinlist(['成绩趋势(不可用)','班级成绩分布(不可用)','班级排名','所有题目','原卷','返回考试列表'],
             color('\n   '+testname+'\n\n',black,bg=white)+f" {color(str(d['stuScore']/100),yellow)} 分   {d['scoreLevel']}\n\
- 班排 {color(str(d['clzRankPosition']),yellow)} 名   年排 {color(str(d['grdRankPosition']),yellow)} 名\n",fm='  {}',focm=' |{}')
+ 班排 {color(str(d['clzRankPosition']),yellow)} 名   年排 {color(str(d['grdRankPosition']),yellow)} 名({color('↑'+str(d['grdRankChanged']),green) if d['grdRankChanged']>0 else color('↓'+str(-d['grdRankChanged']),red)})\n",fm='  {}',focm=' |{}')
         clear()
         if tmp==5:break
         [lambda x:None,lambda x:None,bjpm,tm,yj][tmp](d)

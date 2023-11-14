@@ -1,0 +1,7 @@
+os
+time
+msvcrt
+colorama
+requests
+functools
+webbrowser

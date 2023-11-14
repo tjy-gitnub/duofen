@@ -9,6 +9,7 @@ blue=34
 pink=35
 cyan=36
 white=37
+fullchar='█'
 def color(what,text=None,bg=None,bold=False,underline=False,blink=False,fanxian=False,disnone=False):
     clist=[]
     clist.append(str(text)) if text else None
@@ -37,9 +38,10 @@ def defcolor():
 
 
 def clear():
-    print("\x1b[2J",end='')
+    print("\x1b[2J\x1b[H",end='')
 
-clear_c="\x1b[2J"
+clear_c="\x1b[2J\x1b[H"
+clear_line_c="\r\033[K"
 
 def error(ty, msg):
     print(color("> ",red),end='')
